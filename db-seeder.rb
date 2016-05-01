@@ -136,8 +136,6 @@ class DBSeeder
     @db.transaction do
       car_specs.each_key do |company_name|
         car_specs[company_name].each do |car_spec|
-          puts car_spec['car_name_code']
-          sleep 0.01
           num = rand(0..100)
           @db[:stocks].insert(
             car_name_code: car_spec['car_name_code'],
