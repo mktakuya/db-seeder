@@ -4,7 +4,7 @@ require 'yaml'
 require './dic'
 require './terms'
 
-class DBSeeder
+class DBSetup
   attr_accessor :db
   TABLE_NAMES = %w(company_names car_names car_types specs stocks)
 
@@ -15,7 +15,7 @@ class DBSeeder
 
   def run
     car_specs = assemble_hash
-    throw_to_db(car_specs)
+    setup_db(car_specs)
   end
 
   def assemble_hash
@@ -28,11 +28,11 @@ class DBSeeder
     car_specs
   end
 
-  def throw_to_db(car_specs)
+  def setup_db(car_specs)
     TABLE_NAMES.each do |table_name|
-      self.send("throw_to_#{table_name}", car_specs)
+      self.send("setup_#{table_name}", car_specs)
     end
-    throw_to_terms(TERMS)
+    setup_terms(TERMS)
   end
 
   private
@@ -48,7 +48,7 @@ class DBSeeder
     car_specs
   end
 
-  def throw_to_company_names(car_specs)
+  def setup_company_names(car_specs)
     @db.transaction do
       car_specs.each_key do |company_name|
         @db[:company_names].insert(name: company_name)
@@ -56,7 +56,7 @@ class DBSeeder
     end
   end
 
-  def throw_to_car_names(car_specs)
+  def setup_car_names(car_specs)
     car_names = []
     car_specs.each_key do |company_name|
       car_specs[company_name].each do |car_spec|
@@ -71,7 +71,7 @@ class DBSeeder
     end
   end
 
-  def throw_to_car_types(car_specs)
+  def setup_car_types(car_specs)
     car_types = []
     car_specs.each_key do |company_name|
       car_specs[company_name].each do |car_spec|
@@ -86,7 +86,7 @@ class DBSeeder
     end
   end
 
-  def throw_to_specs(car_specs)
+  def setup_specs(car_specs)
     string_columns = @db.schema(:specs).select { |s|
       s[1][:type] == :string
     }.map { |s| s[0].to_s }
@@ -131,7 +131,7 @@ class DBSeeder
     end
   end
 
-  def throw_to_stocks(car_specs)
+  def setup_stocks(car_specs)
     @db.transaction do
       car_specs.each_key do |company_name|
         car_specs[company_name].each do |car_spec|
@@ -147,7 +147,7 @@ class DBSeeder
     end
   end
 
-  def throw_to_terms(terms)
+  def setup_terms(terms)
     terms.each do |term|
       @db.transaction do
         @db[:terms].insert(abbrev_name: term[0], formal_name: term[1])
@@ -157,7 +157,7 @@ class DBSeeder
 end
 
 if $0 == __FILE__
-  db_seeder = DBSeeder.new
-  db_seeder.run
+  db_setup = DBSetup.new
+  db_setup.run
 end
 
