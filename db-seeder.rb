@@ -111,8 +111,13 @@ class DBSeeder
             @db[:car_types].where(name: car_spec['car_type']).all[0][:code]
 
           string_columns.each { |column_name| car_spec[column_name] ||= '' }
-          integer_columns.each { |column_name| car_spec[column_name] ||= -1 }
-          float_columns.each { |column_name| car_spec[column_name] ||= -1 }
+
+          integer_columns.each do |column_name|
+            car_spec[column_name] ||= -1
+          end
+          float_columns.each do |column_name|
+            car_spec[column_name] ||= -1
+          end
 
           car_spec.store("company_name_code", company_name_code)
           car_spec.store("car_name_code", car_name_code)
@@ -127,6 +132,14 @@ class DBSeeder
   end
 
   def throw_to_stocks(car_specs)
+    @db.transaction do
+      car_specs.each do |car_spec|
+        @db.insert(
+          grade: car_spec['grade'],
+          capacity: car_spec['grade']
+        )
+      end
+    end
   end
 
   def throw_to_terms(terms)
