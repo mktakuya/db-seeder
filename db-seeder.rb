@@ -6,6 +6,7 @@ require './terms'
 
 class DBSeeder
   attr_accessor :db
+  TABLE_NAMES = %w(company_names car_names car_types specs stocks)
 
   def initialize
     connect_opt = YAML.load_file('./config.yml')
@@ -28,11 +29,9 @@ class DBSeeder
   end
 
   def throw_to_db(car_specs)
-    throw_to_company_names(car_specs)
-    throw_to_car_names(car_specs)
-    throw_to_car_types(car_specs)
-    throw_to_specs(car_specs)
-    throw_to_stocks(car_specs)
+    TABLE_NAMES.each do |table_name|
+      self.send("throw_to_#{table_name}", car_specs)
+    end
     throw_to_terms(TERMS)
   end
 
