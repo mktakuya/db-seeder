@@ -5,6 +5,8 @@ require './dic'
 require './terms'
 
 class DBSeeder
+  attr_accessor :db
+
   def initialize
     connect_opt = YAML.load_file('./config.yml')
     @db = Sequel.postgres('h28_j5_g3', connect_opt)
@@ -30,7 +32,7 @@ class DBSeeder
     throw_to_car_names(car_specs)
     throw_to_car_types(car_specs)
     throw_to_specs(car_specs)
-    #throw_to_stocks(car_specs)
+    throw_to_stocks(car_specs)
     throw_to_terms(TERMS)
   end
 
@@ -111,7 +113,6 @@ class DBSeeder
             @db[:car_types].where(name: car_spec['car_type']).all[0][:code]
 
           string_columns.each { |column_name| car_spec[column_name] ||= '' }
-
           integer_columns.each do |column_name|
             car_spec[column_name] ||= -1
           end
@@ -133,11 +134,18 @@ class DBSeeder
 
   def throw_to_stocks(car_specs)
     @db.transaction do
-      car_specs.each do |car_spec|
-        @db.insert(
-          grade: car_spec['grade'],
-          capacity: car_spec['grade']
-        )
+      car_specs.each_key do |company_name|
+        car_specs[company_name].each do |car_spec|
+          puts car_spec['car_name_code']
+          sleep 0.01
+          num = rand(0..100)
+          @db[:stocks].insert(
+            car_name_code: car_spec['car_name_code'],
+            grade: car_spec['grade'],
+            capacity: car_spec['capacity'],
+            num: num
+          )
+        end
       end
     end
   end
