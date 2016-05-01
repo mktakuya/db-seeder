@@ -15,6 +15,7 @@ class DBSetup
 
   def run
     car_specs = assemble_hash
+    reset_db
     setup_db(car_specs)
   end
 
@@ -33,6 +34,12 @@ class DBSetup
       self.send("setup_#{table_name}", car_specs)
     end
     setup_terms(TERMS)
+  end
+
+  def reset_db
+    @db.run('DROP SCHEMA public CASCADE;')
+    @db.run('CREATE SCHEMA public;')
+    system('psql -f ./create_tables.sql -d h28_j5_g3')
   end
 
   private
