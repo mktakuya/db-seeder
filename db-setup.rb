@@ -118,7 +118,7 @@ class DBSetup
           car_type_code =
             @db[:car_types].where(name: car_spec['car_type']).all[0][:code]
 
-          string_columns.each { |column_name| car_spec[column_name] ||= '' }
+          string_columns.each { |column_name| car_spec[column_name] ||= 'none' }
           integer_columns.each do |column_name|
             car_spec[column_name] ||= -1
           end
